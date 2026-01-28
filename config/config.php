@@ -37,5 +37,23 @@ function generateUserID($level)
 
 function generateBarangID($kategori)
 {
+    // brg-smbk-001
     global $conn;
+
+    $queryKodeKategori = "SELECT kodeKategori FROM kategori WHERE idKategori = '$kategori'";
+    $getKodeKategori = mysqli_query($conn, $queryKodeKategori);
+    $kodeKategori = mysqli_fetch_assoc($getKodeKategori)['kodeKategori'];
+    $getLastNumber = "SELECT idBarang FROM barang WHERE kategoriBarangID = '$kategori' ORDER BY idBarang DESC LIMIT 1";
+    $query = mysqli_query($conn, $getLastNumber);
+    $resultID = mysqli_fetch_assoc($query);
+
+    if ($resultID) {
+        $lastNumber = (int) substr($resultID['idUser'], -3);
+        $newNumber = $lastNumber + 1;
+    } else {
+        $newNumber = 1;
+    }
+
+    $newID = "brg-" . $kodeKategori . "-" . str_pad($newNumber, 3, "0", STR_PAD_LEFT);
+    return $newID;
 }
