@@ -13,6 +13,19 @@ if (!$conn) {
     echo "Koneksi gagal!";
 }
 
+function generateRandomChars($length)
+{
+    $chars = "ABCDEFGHIJKLMNPQRSTUVWXYZ23456789";
+    $result = "";
+
+    for ($i = 0; $i < $length; $i++) {
+        $index = random_int(0, strlen($chars) - 1);
+        $result .= $chars[$index];
+    }
+
+    return $result;
+}
+
 
 function generateUserID($level)
 {
@@ -32,7 +45,7 @@ function generateUserID($level)
     }
 
     $newID = "usr-" . $kodeLevel . "-" . str_pad($newNumber, 3, "0", STR_PAD_LEFT);
-    return $newID;
+    return strtoupper($newID);
 }
 
 function generateBarangID($kategori)
@@ -48,12 +61,27 @@ function generateBarangID($kategori)
     $resultID = mysqli_fetch_assoc($query);
 
     if ($resultID) {
-        $lastNumber = (int) substr($resultID['idUser'], -3);
+        $lastNumber = (int) substr($resultID['idBarang'], -3);
         $newNumber = $lastNumber + 1;
     } else {
         $newNumber = 1;
     }
 
     $newID = "brg-" . $kodeKategori . "-" . str_pad($newNumber, 3, "0", STR_PAD_LEFT);
+    return strtoupper($newID);
+}
+
+function generateMemberID()
+{
+    global $conn;
+    // MEM-20260205-ZXGH2
+    $currentDate = date("Ymd");
+    do {
+        $randomChars = generateRandomChars(5);
+        $newID = "MEM-" . $currentDate . "-" .  $randomChars;
+
+        $queryCekID = "SELECT 1 FROM member WHERE idMember = '$newID'";
+        $cekId = mysqli_query($conn, $queryCekID);
+    } while (mysqli_num_rows($cekId) > 0);
     return $newID;
 }
